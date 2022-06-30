@@ -6,13 +6,15 @@ import (
 	"log"
 	"net/http"
 	"task/internal/app/handlers"
-	repomemory "task/internal/app/repositories/memory"
+	json2 "task/internal/app/repositories/json"
+
+	//	repomemory "task/internal/app/repositories/memory"
 	"task/internal/app/services/configmanager"
 	"task/internal/app/services/mailsendingmanager"
 	"task/internal/app/services/voteeventmanager"
 	"task/internal/app/services/votelinkmanager"
 	"task/internal/app/services/votemanager"
-	"task/internal/app/store/memory"
+	"task/internal/app/store/json"
 )
 
 var (
@@ -31,8 +33,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	taskRepo := repomemory.NewTaskRepo()
-	store := memory.NewStore(taskRepo)
+	//	taskRepo := repomemory.NewTaskRepo()
+	taskRepo := json2.NewTaskRepo(config)
+	//	store := memory.NewStore(taskRepo)
+	store := json.NewStore(taskRepo, config)
 	vlm := votelinkmanager.NewEncryptVoteLinkManager(config)
 	vem := voteeventmanager.NewVoteEventManager()
 	msm := mailsendingmanager.NewDummyMailSendingManager()
