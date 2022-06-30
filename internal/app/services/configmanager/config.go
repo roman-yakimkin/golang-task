@@ -8,6 +8,7 @@ import (
 type Config struct {
 	BindAddr     string `yaml:"bind_addr"`
 	SecretString string `yaml:"secret_string"`
+	JsonPathTask string `yaml:"json_path_task"`
 }
 
 func NewConfig() *Config {
