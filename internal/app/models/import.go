@@ -1,14 +1,14 @@
 package models
 
 type ImportTask struct {
-	AuthorID int      `json:"author_id"`
+	AuthorID string   `json:"author_id"`
 	Title    string   `json:"title"`
 	Body     string   `json:"body"`
 	Emails   []string `json:"emails"`
 }
 
 type UpdateTask struct {
-	ID    int    `json:"id"`
+	ID    string `json:"id"`
 	Title string `json:"title"`
 	Body  string `json:"body"`
 }

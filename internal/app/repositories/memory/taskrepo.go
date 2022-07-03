@@ -1,33 +1,33 @@
 package memory
 
 import (
-	"sort"
+	"strconv"
 	"task/internal/app/errors"
 	"task/internal/app/models"
 )
 
 type TaskRepo struct {
-	tasks  map[int]models.Task
+	tasks  map[string]models.Task
 	lastID int
 }
 
 func NewTaskRepo() *TaskRepo {
 	return &TaskRepo{
-		tasks: make(map[int]models.Task),
+		tasks: make(map[string]models.Task),
 	}
 }
 
-func (r *TaskRepo) Save(task *models.Task) (int, error) {
+func (r *TaskRepo) Save(task *models.Task) (string, error) {
 	task.BeforeSave()
-	if task.ID == 0 {
+	if task.ID == "" {
 		r.lastID++
-		task.ID = r.lastID
+		task.ID = strconv.Itoa(r.lastID)
 	}
 	r.tasks[task.ID] = *task
 	return task.ID, nil
 }
 
-func (r *TaskRepo) Delete(taskID int) error {
+func (r *TaskRepo) Delete(taskID string) error {
 	_, ok := r.tasks[taskID]
 	if !ok {
 		return errors.ErrTaskNotFound
@@ -36,7 +36,7 @@ func (r *TaskRepo) Delete(taskID int) error {
 	return nil
 }
 
-func (r *TaskRepo) GetByID(id int) (*models.Task, error) {
+func (r *TaskRepo) GetByID(id string) (*models.Task, error) {
 	task, ok := r.tasks[id]
 	if !ok {
 		return nil, errors.ErrTaskNotFound
@@ -49,8 +49,5 @@ func (r *TaskRepo) GetAll() ([]models.Task, error) {
 	for _, task := range r.tasks {
 		result = append(result, task)
 	}
-	sort.SliceStable(result, func(i, j int) bool {
-		return result[i].ID < result[j].ID
-	})
 	return result, nil
 }

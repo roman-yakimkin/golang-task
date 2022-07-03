@@ -57,7 +57,7 @@ func (vl *EncryptVoteLinkManager) decrypt(text, secret string) (string, error) {
 }
 
 func (vl *EncryptVoteLinkManager) Generate(data interfaces.VoteLinkData) string {
-	str := fmt.Sprintf("%s %d %t %s", data.Email, data.TaskID, data.Result, data.Checksum)
+	str := fmt.Sprintf("%s %s %t %s", data.Email, data.TaskID, data.Result, data.Checksum)
 	encLink, err := vl.encrypt(str, vl.config.SecretString)
 	if err != nil {
 		log.Fatal(err)
@@ -71,7 +71,7 @@ func (vl *EncryptVoteLinkManager) Parse(link string) (interfaces.VoteLinkData, e
 		return interfaces.VoteLinkData{}, err
 	}
 	var data interfaces.VoteLinkData
-	_, err = fmt.Sscanf(decTex, "%s %d %t %s", &data.Email, &data.TaskID, &data.Result, &data.Checksum)
+	_, err = fmt.Sscanf(decTex, "%s %s %t %s", &data.Email, &data.TaskID, &data.Result, &data.Checksum)
 	if err != nil {
 		return interfaces.VoteLinkData{}, errors.ErrVoteLinkNotParsed
 	}

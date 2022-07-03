@@ -19,26 +19,26 @@ func NewTaskRepo(config *configmanager.Config) *TaskRepo {
 	}
 }
 
-func (r *TaskRepo) getFileName(id int) string {
-	return r.config.JsonPathTask + "/" + strconv.Itoa(id) + ".json"
+func (r *TaskRepo) getFileName(id string) string {
+	return r.config.JsonPathTask + "/" + id + ".json"
 }
 
-func (r *TaskRepo) getID() (int, error) {
+func (r *TaskRepo) getID() (string, error) {
 	fileName := r.config.JsonPathTask + "/maxid"
 	fl, err := os.ReadFile(fileName)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 	maxId, err := strconv.Atoi(string(fl[:]))
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 	maxId++
 	err = os.WriteFile(fileName, []byte(strconv.Itoa(maxId)), 0666)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
-	return maxId, nil
+	return strconv.Itoa(maxId), nil
 }
 
 func (r *TaskRepo) getTaskFromFile(fileName string) (*models.Task, error) {
@@ -54,29 +54,29 @@ func (r *TaskRepo) getTaskFromFile(fileName string) (*models.Task, error) {
 	return &task, nil
 }
 
-func (r *TaskRepo) Save(task *models.Task) (int, error) {
+func (r *TaskRepo) Save(task *models.Task) (string, error) {
 	task.BeforeSave()
 	var err error
-	if task.ID == 0 {
+	if task.ID == "" {
 		task.ID, err = r.getID()
 		if err != nil {
-			return 0, err
+			return "", err
 		}
 	}
 	bytes, err := json.Marshal(task)
 	err = os.WriteFile(r.getFileName(task.ID), bytes, 0666)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 	return task.ID, nil
 }
 
-func (r *TaskRepo) Delete(taskID int) error {
+func (r *TaskRepo) Delete(taskID string) error {
 	err := os.Remove(r.getFileName(taskID))
 	return err
 }
 
-func (r *TaskRepo) GetByID(id int) (*models.Task, error) {
+func (r *TaskRepo) GetByID(id string) (*models.Task, error) {
 	return r.getTaskFromFile(r.getFileName(id))
 }
 

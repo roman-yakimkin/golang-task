@@ -6,7 +6,9 @@ import (
 	"log"
 	"net/http"
 	"task/internal/app/handlers"
-	json2 "task/internal/app/repositories/json"
+	repomongo "task/internal/app/repositories/mongo"
+	"task/internal/app/services/dbclient"
+	"task/internal/app/store/mongo"
 
 	//	repomemory "task/internal/app/repositories/memory"
 	"task/internal/app/services/configmanager"
@@ -14,7 +16,6 @@ import (
 	"task/internal/app/services/voteeventmanager"
 	"task/internal/app/services/votelinkmanager"
 	"task/internal/app/services/votemanager"
-	"task/internal/app/store/json"
 )
 
 var (
@@ -34,9 +35,12 @@ func main() {
 	}
 
 	//	taskRepo := repomemory.NewTaskRepo()
-	taskRepo := json2.NewTaskRepo(config)
+	//taskRepo := json2.NewTaskRepo(config)
+	db := dbclient.NewMongoDBClient(config)
+	taskRepo := repomongo.NewTaskRepo(db)
 	//	store := memory.NewStore(taskRepo)
-	store := json.NewStore(taskRepo, config)
+	//store := json.NewStore(taskRepo, config)
+	store := mongo.NewStore(db, taskRepo)
 	vlm := votelinkmanager.NewEncryptVoteLinkManager(config)
 	vem := voteeventmanager.NewVoteEventManager()
 	msm := mailsendingmanager.NewDummyMailSendingManager()
@@ -50,10 +54,10 @@ func main() {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/task", taskCtrl.Create).Methods("POST")
-	router.HandleFunc("/task/{id:[0-9]+}", taskCtrl.Get).Methods("GET")
+	router.HandleFunc("/task/{id}", taskCtrl.Get).Methods("GET")
 	router.HandleFunc("/tasks", taskCtrl.GetAll).Methods("GET")
 	router.HandleFunc("/task", taskCtrl.Update).Methods("PUT")
-	router.HandleFunc("/task/{id:[0-9]+}", taskCtrl.Delete).Methods("DELETE")
+	router.HandleFunc("/task/{id}", taskCtrl.Delete).Methods("DELETE")
 
 	router.HandleFunc("/vote/{vote_link}", taskCtrl.Vote).Methods("GET")
 
