@@ -2,7 +2,7 @@ package interfaces
 
 type VoteLinkData struct {
 	Email    string
-	TaskID   int
+	TaskID   string
 	Result   bool
 	Checksum string
 }

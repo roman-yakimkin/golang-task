@@ -15,15 +15,15 @@ const (
 )
 
 type TaskReaction struct {
-	Email    string    `json:"email"`
-	Sent     time.Time `json:"sent"`
-	Voted    time.Time `json:"voted"`
-	Approved bool      `json:"approved"`
+	Email    string    `json:"email" bson:"email"`
+	Sent     time.Time `json:"sent" bson:"sent"`
+	Voted    time.Time `json:"voted" bson:"voted"`
+	Approved bool      `json:"approved" bson:"approved"`
 }
 
 type Task struct {
-	ID        int            `json:"id"`
-	AuthorID  int            `json:"author_id"`
+	ID        string         `json:"id"`
+	AuthorID  string         `json:"author_id"`
 	Title     string         `json:"title"`
 	Body      string         `json:"body"`
 	Created   time.Time      `json:"created"`

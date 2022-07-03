@@ -3,3 +3,5 @@ bind_addr: ":8010"
 secret_string: "fvneo5no7goo8nao1dnoofergsbDgR91"
 
 json_path_task: "./data-json/tasks"
+
+mongodb_connection_string: "mongodb://localhost:27017"

@@ -5,7 +5,6 @@ import (
 	"github.com/gorilla/mux"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 	"task/internal/app/errors"
 	"task/internal/app/interfaces"
 	"task/internal/app/models"
@@ -42,7 +41,7 @@ func (c *TaskController) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	returnSuccessResponse(w, r, "task has been updated", struct {
-		Id int `json:"id"`
+		Id string `json:"id"`
 	}{Id: taskId})
 
 	_, err = c.vm.DoRouting(&task)
@@ -52,12 +51,8 @@ func (c *TaskController) Create(w http.ResponseWriter, r *http.Request) {
 
 func (c *TaskController) Get(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	taskIdStr, ok := vars["id"]
+	taskId, ok := vars["id"]
 	if returnErrorResponse(!ok, w, r, http.StatusNotFound, errors.ErrTaskNotFound, "") {
-		return
-	}
-	taskId, err := strconv.Atoi(taskIdStr)
-	if returnErrorResponse(err != nil, w, r, http.StatusNotFound, err, "") {
 		return
 	}
 	task, err := c.store.Task().GetByID(taskId)
@@ -102,26 +97,24 @@ func (c *TaskController) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	returnSuccessResponse(w, r, "task has been updated", struct {
-		Id int `json:"id"`
+		Id string `json:"id"`
 	}{Id: task.ID})
 
-	_, err = c.vm.DoRouting(task)
-	if err != nil {
-	}
+	c.vm.DoRouting(task)
 }
 
 func (c *TaskController) Delete(w http.ResponseWriter, r *http.Request) {
 	profile := r.Context().Value("profile").(MiddlewareProfile)
 	vars := mux.Vars(r)
-	taskIdStr, ok := vars["id"]
+	taskId, ok := vars["id"]
 	if returnErrorResponse(!ok, w, r, http.StatusNotFound, errors.ErrTaskNotFound, "") {
 		return
 	}
-	taskId, err := strconv.Atoi(taskIdStr)
-	if returnErrorResponse(err != nil, w, r, http.StatusNotFound, err, "") {
+	task, err := c.store.Task().GetByID(taskId)
+	if returnErrorResponse(err != nil, w, r, http.StatusNoContent, err, "") {
 		return
 	}
-	if returnErrorResponse(profile.UserID != taskId, w, r, http.StatusForbidden, nil, "No enough right to delete task") {
+	if returnErrorResponse(profile.UserID != task.AuthorID, w, r, http.StatusForbidden, nil, "No enough right to delete task") {
 		return
 	}
 	err = c.store.Task().Delete(taskId)
@@ -129,7 +122,7 @@ func (c *TaskController) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	returnSuccessResponse(w, r, "task has been updated", struct {
-		Id int `json:"id"`
+		Id string `json:"id"`
 	}{Id: taskId})
 }
 

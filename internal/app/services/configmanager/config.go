@@ -6,9 +6,10 @@ import (
 )
 
 type Config struct {
-	BindAddr     string `yaml:"bind_addr"`
-	SecretString string `yaml:"secret_string"`
-	JsonPathTask string `yaml:"json_path_task"`
+	BindAddr       string `yaml:"bind_addr"`
+	SecretString   string `yaml:"secret_string"`
+	JsonPathTask   string `yaml:"json_path_task"`
+	MongoDBConnStr string `yaml:"mongo_db_connection_string"`
 }
 
 func NewConfig() *Config {
