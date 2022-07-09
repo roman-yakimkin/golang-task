@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"golang.org/x/exp/slices"
 	"io/ioutil"
 	"net/http"
 	"task/internal/app/errors"
@@ -23,6 +24,12 @@ func NewTaskController(store interfaces.Store, vm interfaces.VoteManager) *TaskC
 }
 
 func (c *TaskController) Create(w http.ResponseWriter, r *http.Request) {
+	profile := r.Context().Value("profile").(MiddlewareProfile)
+	access := slices.Contains(profile.Roles, "task_creator")
+	if returnErrorResponse(!access, w, r, http.StatusForbidden, errors.ErrNoEnoughRightsToCreateTask, "") {
+		return
+	}
+
 	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if returnErrorResponse(err != nil, w, r, http.StatusInternalServerError, err, "") {
@@ -82,7 +89,7 @@ func (c *TaskController) Update(w http.ResponseWriter, r *http.Request) {
 	if returnErrorResponse(err != nil, w, r, http.StatusInternalServerError, err, "") {
 		return
 	}
-	if returnErrorResponse(profile.UserID != updTask.ID, w, r, http.StatusForbidden, nil, "No enough right to update task") {
+	if returnErrorResponse(profile.UserID != updTask.ID, w, r, http.StatusForbidden, errors.ErrNoEnoughRightsToUpdateTask, "") {
 		return
 	}
 	task, err := c.store.Task().GetByID(updTask.ID)
@@ -114,7 +121,7 @@ func (c *TaskController) Delete(w http.ResponseWriter, r *http.Request) {
 	if returnErrorResponse(err != nil, w, r, http.StatusNoContent, err, "") {
 		return
 	}
-	if returnErrorResponse(profile.UserID != task.AuthorID, w, r, http.StatusForbidden, nil, "No enough right to delete task") {
+	if returnErrorResponse(profile.UserID != task.AuthorID, w, r, http.StatusForbidden, errors.ErrNoEnoughRightsToDeleteTask, "") {
 		return
 	}
 	err = c.store.Task().Delete(taskId)
