@@ -1,15 +1,15 @@
 package configmanager
 
 import (
-	"gopkg.in/yaml.v3"
+	"gopkg.in/yaml.v2"
 	"os"
 )
 
 type Config struct {
-	BindAddr       string `yaml:"bind_addr"`
-	SecretString   string `yaml:"secret_string"`
-	JsonPathTask   string `yaml:"json_path_task"`
-	MongoDBConnStr string `yaml:"mongo_db_connection_string"`
+	BindAddr     string `yaml:"bind_addr"`
+	GRPCBindAddr string `yaml:"grpc_bind_addr"`
+	SecretString string `yaml:"secret_string"`
+	JsonPathTask string `yaml:"json_path_task"`
 }
 
 func NewConfig() *Config {

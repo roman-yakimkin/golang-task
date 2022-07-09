@@ -1,4 +1,5 @@
 bind_addr: ":8010"
+grpc_bind_addr: ":50051"
 
 secret_string: "fvneo5no7goo8nao1dnoofergsbDgR91"
 

@@ -5,8 +5,10 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"task/internal/app/grpc/client"
 	"task/internal/app/handlers"
 	repomongo "task/internal/app/repositories/mongo"
+	"task/internal/app/services/cookiestokenstorage"
 	"task/internal/app/services/dbclient"
 	"task/internal/app/store/mongo"
 
@@ -49,7 +51,9 @@ func main() {
 
 	taskCtrl := handlers.NewTaskController(store, vm)
 
-	mw := handlers.NewMiddleware()
+	ts := cookiestokenstorage.CookiesTokenStorage{}
+	vc := client.NewGRPCValidatorClient(config)
+	mw := handlers.NewMiddleware(&ts, vc)
 
 	router := mux.NewRouter()
 
